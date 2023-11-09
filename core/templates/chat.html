@@ -1,0 +1,136 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+  <meta charset="UTF-8">
+  <title>CodePen - HTML/CSS implementation of HipChat redesign</title>
+  <link rel='stylesheet' href='https://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css'>
+<link rel='stylesheet' href='https://fonts.googleapis.com/css?family=Open+Sans'>
+<link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/jScrollPane/2.2.1/style/jquery.jscrollpane.min.css'><link rel="stylesheet" href="./style.css">
+<link rel="stylesheet" type="text/css" href="{% static 'css/estilos.css' %}">
+</head>
+<body>
+<!-- partial:index.partial.html -->
+<div class="window-wrapper">
+		<div class="window-title">
+			<div class="dots">
+				<i class="fa fa-commenting"></i>
+				<i class="fa fa-commenting"></i>
+				<i class="fa fa-commenting"></i>
+			</div>
+			<div class="title">
+				<span>Datafy</span>
+			</div>
+			<div class="expand">
+				<i class="fa fa-expand"></i>
+			</div>
+		</div>
+		<div class="window-area">
+			<div class="conversation-list">
+				<ul class="">
+          <li class="item"><a href="#"><i class="fa fa-list-alt"></i><span>Dashboard</span></a></li>
+					<li class="item active"><a href="#"><i class="fa fa-user"></i><span>Team chat</span><i class="fa fa-times"></i></a></li>
+					<li><a href="#"><i class="fa fa-commenting-o online"></i></i><span>Cucu Ionel</span><i class="fa fa-times"></i></a></li>
+					<li><a href="#"><i class="fa fa-commenting-o idle"></i></i><span>Jan Dvořák</span><i class="fa fa-times"></i></a></li>
+					<li><a href="#"><i class="fa fa-commenting-o offline"></i></i><span>Clark Kent</span><i class="fa fa-times"></i></a></li>
+          <li><a href="#"><i class="fa fa-commenting-o offline"></i></i><span>Ioana Marcu</span><i class="fa fa-times"></i></a></li>
+				</ul>
+				<div class="my-account">
+					<div class="image">
+						<img src="https://secure.gravatar.com/avatar/de76e03aa6b5b0bf675c1e8a990da52f?s=64">
+						<i class="fa fa-circle online"></i>
+					</div>
+					<div class="name">
+						<span>user</span>
+						<i class="fa fa-angle-down"></i>
+						<span class="availability">Available</span>
+					</div>
+
+				</div>
+			</div>
+			<div class="chat-area">
+				<div class="title"><b>Conversation title</b><i class="fa fa-search"></i></div>
+				<div class="chat-list">
+					<li><a href="#"><i class="fa fa-commenting-o offline"></i></i><span>Test</span><i class="fa fa-times"></i></a></li>
+				</div>
+
+				<form class="message-form">
+					{%csrf_token%}
+					<div class="input-area">
+						<div class="input-wrapper">
+							<input type="text" class="form-control message-input" placeholder="Type your message...">
+							<i class="fa fa-smile-o"></i>
+							<i class="fa fa-paperclip"></i>
+						</div>
+						<button type="submit" class="btn btn-primary btn-send">Send</button>
+					</div>
+				</form>
+
+			</div>
+		</div>
+	</div>
+	
+	<script>
+		const messagesList = document.querySelector('.chat-list');
+		const messageForm = document.querySelector('.message-form');
+		const messageInput = document.querySelector('.message-input');
+
+		messageForm.addEventListener('submit', (event) => {
+		event.preventDefault();
+
+		const message = messageInput.value.trim();
+		if (message.length === 0) {
+		return;
+		}
+
+		const messageItem = document.createElement('li');
+		messageItem.classList.add('message', 'sent');
+		messageItem.innerHTML = `
+			<div class="message-text">
+				<div class="message-sender">
+					<b>You</b>
+				</div>
+				<div class="message-content">
+					${message}
+				</div>
+			</div>`;
+		messagesList.appendChild(messageItem);
+
+		messageInput.value = '';
+
+		fetch('', {
+		method: 'POST',
+		headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+		body: new URLSearchParams({
+			'csrfmiddlewaretoken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+			'message': message
+		})
+		})
+		.then(response => response.json())
+		.then(data => {
+			const response = data.response;
+			const messageItem = document.createElement('li');
+			messageItem.classList.add('message', 'received');
+			messageItem.innerHTML = `
+			<div class="message-text">
+				<div class="message-sender">
+				<b>AI Chatbot</b>
+				</div>
+				<div class="message-content">
+					${response}
+				</div>
+			</div>
+			`;
+        messagesList.appendChild(messageItem);
+      });
+  });
+
+	</script>
+
+<!-- partial -->
+  <script src='https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js'></script>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/jquery-mousewheel/3.1.11/jquery.mousewheel.min.js'></script>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/jScrollPane/2.0.14/jquery.jscrollpane.min.js'></script><script  src="./script.js"></script>
+
+</body>
+</html>
