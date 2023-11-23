@@ -1,0 +1,19 @@
+    {% for message in messages %}
+    <div class="alert alert-{{ message.tag }} alert-dismissible fade show" role="alert">
+
+        <strong>Mensagem:</strong> {{ message }}
+        <button type="button" class="close" alert-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    {% endfor %}
+
+    {% if user.is_authenticated %}
+    <h3>Olá {{ nome }}</h3>
+    <h4>Login realizado com sucesso</h4>
+    <button type="submit"><a href="/signout">SignOut</a></button>
+    <button type="submit"><a href="/chat">Chat</a></button>
+    {% else %}
+    <button type="submit"><a href="/signin">SignIn</a></button>
+    <button type="submit"><a href="/signup">SignUp</a></button>
+    {% endif %}

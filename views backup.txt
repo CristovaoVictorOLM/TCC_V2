@@ -1,0 +1,127 @@
+from django.http import JsonResponse
+from django.shortcuts import redirect, render
+import openai
+from .models import Login
+from django.contrib.auth.models import User
+from django.contrib import messages
+from django.contrib.auth import authenticate, login, logout
+from datafy import settings
+from django.core.mail import send_mail
+
+# Create your views here.
+
+openai_api_key='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'
+openai.api_key = openai_api_key
+
+def home(request):
+    return render(request, "index.html")
+
+
+def signup(request):
+
+    if request.method == "POST":
+        usuario = request.POST['usuario']
+        nome = request.POST['nome']
+        sobrenome = request.POST['sobrenome']
+        email =  request.POST['email']
+        senha = request.POST['senha']
+        csenha = request.POST['csenha']
+
+        if User.objects.filter(username=usuario):
+            messages.error(request, "Usuário já existe. Favor tentar novamente.")
+            return redirect('home')
+
+        if User.objects.filter(email=email):
+            messages.error(request, "O e-mail já foi utilizado.")
+            return redirect('home')
+        
+        if len(usuario)>15:
+            messages.error(request, "O nome de usuario deve ser menor.")
+
+        if senha != csenha:
+            messages.error(request, "As senhas são diferentes.")
+
+        if not usuario.isalnum():
+            messages.error(request, "O usuario deve ser Alpha-numeric.")
+            return redirect('home')
+
+        myuser = User.objects.create_user(usuario, email, senha)
+        myuser.first_name = nome
+        myuser.last_name = sobrenome
+
+        myuser.save()
+
+        messages.success(request, "Sua conta foi registrada com sucesso.")
+
+        # Welcome email
+
+        subject = "Seja bem vindo à plataforma Datafy!"
+        menssage = "Olá" + myuser.first_name + "!! \n" + "Seja bem-vindo à Datafy \n Muito obrigado por utilizar nossa plataforma \n Nós iremos enviar para você um e-mail de confirmação, por favor confirme seu endereço de e-mail para ativar sua conta!"
+        from_email = settings.EMAIL_HOST_USER
+        to_list = [myuser.email]
+        send_mail(subject, menssage, from_email, to_list, fail_silently=True)
+
+        return redirect('signin')
+
+    return render(request, "signup.html")
+
+def signin(request):
+
+    if request.method == "POST":
+        usuario = request.POST['usuario']
+        senha = request.POST['senha']
+
+        user = authenticate(usuario=usuario, senha=senha)
+
+        if user is not None:
+            login(request, user)
+            nome = user.first_name
+            return render(request, "index.html", {'nome': nome})
+
+        else:
+            messages.error(request, "Usuário não existente")
+            return redirect('home')
+    
+    return render(request, "signin.html")
+    
+
+def signout(request):
+    logout(request)
+    messages.success(request, "Deslogado com sucesso!")
+    return redirect('home')
+
+
+def ask_openai(message):
+    response = openai.chat.completions.create(
+        model = "gpt-4",
+        messages=[
+            {"role": "system", "content": "You are an helpful assistant."},
+            {"role": "user", "content": message},
+        ]
+    )
+    
+    answer = response.choices[0].message.content.strip()
+    return answer
+
+def chat(request):
+    if request.method == "POST":
+        message = request.POST.get('message')
+        response = ask_openai(message)
+        return JsonResponse({'message':message,'response':response})
+    return render(request, 'chat.html')
+
+
+
+    path('signup', signup, name="signup"),
+    path('signin', signin, name="signin"),
+    path('signout', signout, name="signout"),
+
+
+    EMAIL_USE_TLS = EMAIL_USE_TLS
+EMAIL_HOST = EMAIL_HOST
+EMAIL_HOST_USER = EMAIL_HOST_USER
+EMAIL_HOST_PASSWORD = EMAIL_HOST_PASSWORD
+EMAIL_PORT =  EMAIL_PORT
+
+
+from . info import *
