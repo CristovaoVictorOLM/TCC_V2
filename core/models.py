@@ -11,7 +11,7 @@ class shoppingtrends(models.Model):
     Size = models.TextField()
     Color = models.TextField()
     Season = models.TextField()
-    Review_Rating = models.IntegerField()
+    Review_Rating = models.FloatField()
     Subscription_Status = models.TextField()
     Shipping_Type = models.TextField()
     Discount_Applied = models.TextField()
@@ -20,6 +20,8 @@ class shoppingtrends(models.Model):
     Payment_Method = models.TextField()
     Frequency_of_Purchases = models.TextField()
 
-    
+
+def __str__(self):
+    return f"{self.Customer_ID} - {self.Item_Purchased}"
 
     

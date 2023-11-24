@@ -1,8 +1,8 @@
 from django.contrib import admin
 from django.urls import path
-from .views import home, chat
+from .views import home,processar_csv
 
 urlpatterns = [
     path('', home, name="home"),
-    path('chat', chat, name="chat")
+    path('processar_csv/', processar_csv, name='processar_csv'),
 ]
