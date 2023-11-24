@@ -25,7 +25,7 @@ db_name = "datafy_db"
 
 db = SQLDatabase.from_uri(f"mysql+pymysql://{db_user}:{db_pass}@{db_host}/{db_name}")"""
 
-openai_api_key='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'
+openai_api_key=''
 openai.api_key = openai_api_key
 
 """data_base = connect(host= '127.0.0.1',
@@ -80,7 +80,7 @@ def chat(request):
 
     df=pd.read_sql(query3,engine)
 
-    chat_02 = ChatOpenAI(model_name="gpt-4", temperature=0.0, openai_api_key = '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')
+    chat_02 = ChatOpenAI(model_name="gpt-4", temperature=0.0, openai_api_key = '')
     agent = create_pandas_dataframe_agent(chat_02, df, verbose=True)
     
     if request.method == "POST":
